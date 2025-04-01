@@ -14,11 +14,14 @@ class Program
         using (var connection = new SqlConnection(connectionString))
         {
             //UpdateCategory(connection);
-            // CreateCategory(connection);
+            //CreateCategory(connection);
+            //DeleteCategory(connection);
+            CreateManyCategory(connection);
             ListCategories(connection);
         }
     }
 
+    //methods
     static void ListCategories(SqlConnection connection)
     {
         const string sqlSelect = " select [id], [title] from [category] ";
@@ -29,7 +32,7 @@ class Program
             Console.WriteLine($"{item.Id} - {item.Title}");
         }
     }
-
+    
     static void CreateCategory(SqlConnection connection)
     {
         var category = new Category
@@ -58,7 +61,7 @@ class Program
         });
         Console.WriteLine($"Inserted {rows} rows");
     }
-
+    
     static void UpdateCategory(SqlConnection connection)
     {
         const string sqlUpdate = " update [category] set [title] = @Title where [id] = @Id";
@@ -68,5 +71,68 @@ class Program
             Title = "Frontend"
         });
         Console.WriteLine($"Updated {rows} rows");
+    }
+    
+    static void CreateManyCategory(SqlConnection connection)
+    {
+        var categoryOne = new Category
+        {
+            Id = Guid.NewGuid(),
+            Title = "Amazon AWS",
+            Url = "https://aws.amazon.com",
+            Summary = "AWS Cloud",
+            Order = 8,
+            Description = "Categoria de cursos de aws",
+            Featured = true
+        };
+        
+        var categoryTwo = new Category
+        {
+            Id = Guid.NewGuid(),
+            Title = "Nova Categoria",
+            Url = "https://new.category",
+            Summary = "Nova Categoria",
+            Order = 9,
+            Description = "Categoria de cursos",
+            Featured = false
+        };
+
+        const string sqlInsert = " insert into [category] " +
+                                 " values(@Id, @Title, @Url, @Summary, @Order, @Description, @Featured) ";
+
+        var rows = connection.Execute(sqlInsert, new[]{
+            new
+            {
+                Id = categoryOne.Id,
+                Title = categoryOne.Title,
+                Url = categoryOne.Url,
+                Summary = categoryOne.Summary,
+                Order = categoryOne.Order,
+                Description = categoryOne.Description,
+                Featured = categoryOne.Featured
+            },
+            new
+            {
+                Id = categoryTwo.Id,
+                Title = categoryTwo.Title,
+                Url = categoryTwo.Url,
+                Summary = categoryTwo.Summary,
+                Order = categoryTwo.Order,
+                Description = categoryTwo.Description,
+                Featured = categoryTwo.Featured
+            }
+        });
+        Console.WriteLine($"Inserted {rows} rows");
+    }
+    
+    static void DeleteCategory(SqlConnection connection)
+    {
+        var sqlDelete = " delete from [category] where [id] = @Id ";
+
+        var rows = connection.Execute(sqlDelete, new
+        {
+            id = new Guid("")
+        });
+        Console.WriteLine($"Deleted {rows} rows");
     }
 }
